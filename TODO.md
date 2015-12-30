@@ -1,0 +1,1 @@
+- tests (especially for iterators that do not implement getindex)
