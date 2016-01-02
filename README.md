@@ -17,7 +17,7 @@ The implementation uses generated functions to produce extremely efficient code 
 
 ### Usage
 ```julia
-# This loop requires no heap allocation, becaus tup is of bits type.
+# This loop requires no heap allocation, because tup is of bits type.
 for tup in Combinations{3}(1:6)
     tup::NTuple{3, eltype(1:6)}
     @show tup
@@ -51,7 +51,7 @@ end
 ### Drawbacks
 When the number of elements in a combination is computed at runtime, performance will be slightly worse than `Base.Combinations`. You should only use FastCombinations when the type parameter N is statically known.
 
-Additionaly, when `N` becomes large, so does the generated code. For large values of `N`, compilation times will become unreasonable.
+Additionally, when `N` becomes large, so does the generated code. For large values of `N`, compilation times will become unreasonable.
 ```shell
 $ julia -E 'using FastCombinations; @time first(Combinations{20}(1:40))'
   2.266709 seconds (8.15 M allocations: 343.999 MB, 4.76% gc time)
