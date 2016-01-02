@@ -29,7 +29,7 @@ end
 
 Base.convert{K, T}(::Type{Combinations{K}}, itr::T) = Combinations{K, T}(itr)
 
-eltype{K, T}(::Combinations{K, T}) = NTuple{K, eltype(T)}
+eltype{K, T}(combs::Combinations{K, T}) = NTuple{K, eltype(combs.itr)}
 collect(combs::Combinations) = collect(eltype(combs), combs)
 @generated length{K, T}(combs::Combinations{K, T}) = :(binomial(length(combs.itr), $K))
 
@@ -95,7 +95,7 @@ end
 
 Base.convert{K, T}(::Type{MultiCombinations{K}}, itr::T) = MultiCombinations{K, T}(itr)
 
-eltype{K, T}(::MultiCombinations{K, T}) = NTuple{K, eltype(T)}
+eltype{K, T}(combs::MultiCombinations{K, T}) = NTuple{K, eltype(combs.itr)}
 collect(combs::MultiCombinations) = collect(eltype(combs), combs)
 @generated length{K, T}(combs::MultiCombinations{K, T}) = :(binomial(length(combs.itr) + $(K - 1), $K))
 
