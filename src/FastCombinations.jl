@@ -5,6 +5,24 @@ export Combinations, MultiCombinations
 import Base: start, next, done, length, eltype, collect
 
 # Computes the next $K states of the iterator `itr`, starting from a given state.
+# This function can handle cases where K is larger than the length of the given iterator.
+@generated function initial_states{K}(itr, ::Type{Val{K}})
+    K == 0 && return ()
+    syms = [gensym(:state) for _ in 1:K]
+    expr = Expr(:block, :($(syms[1]) = start(itr)))
+    for i in 2:K
+        sym = syms[i]
+        push!(expr.args, quote
+            (_, $sym) = next(itr, $(syms[i - 1]))
+            done(itr, $sym) && return $(Expr(:tuple, repeated(sym, K)...))
+        end)
+    end
+    push!(expr.args, Expr(:tuple, syms...))
+    expr
+end
+# Computes the next $K states of the iterator `itr`, starting from a given state.
+# This function assumes that the iterator has at least K elements left
+# after the given state.
 @generated function next_states{S, K}(itr, state::S, ::Type{Val{K}})
     K == 0 && return ()
     syms = [gensym(:state) for _ in 1:K]
@@ -18,7 +36,7 @@ import Base: start, next, done, length, eltype, collect
     expr
 end
 
-# A k-combination of a set is a way to select k distinct elements from a set.
+# A k-combination of a set is a way to select exactly k distinct elements from the set.
 immutable Combinations{K, T}
     itr::T
     function Combinations(itr::T)
@@ -33,7 +51,7 @@ eltype{K, T}(combs::Combinations{K, T}) = NTuple{K, eltype(combs.itr)}
 collect(combs::Combinations) = collect(eltype(combs), combs)
 @generated length{K, T}(combs::Combinations{K, T}) = :(binomial(length(combs.itr), $K))
 
-start{K, T}(combs::Combinations{K, T}) = next_states(combs.itr, start(combs.itr), Val{K})
+start{K, T}(combs::Combinations{K, T}) = initial_states(combs.itr, Val{K})
 done{K, T, State}(combs::Combinations{K, T}, state::NTuple{K, State}) = done(combs.itr, state[end])
 
 @generated function next{K, T, State}(combs::Combinations{K, T}, state::NTuple{K, State})
@@ -84,7 +102,7 @@ done{K, T, State}(combs::Combinations{K, T}, state::NTuple{K, State}) = done(com
 end
 
 # a k-multicombination is a combination in which repetition of elements is allowed
-# (though the elements must still be sorted)
+# (though the elements must still be in sorted order)
 immutable MultiCombinations{K, T}
     itr::T
     function MultiCombinations(itr::T)
