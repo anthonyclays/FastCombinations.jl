@@ -26,6 +26,8 @@ end
 
 ### Benchmarks
 ```julia
+const itr = 1:100
+
 function bench_base()
     t = 0
     for _ in combinations(itr, 3)
