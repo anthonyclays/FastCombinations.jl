@@ -57,7 +57,7 @@ done{K, T, State}(combs::Combinations{K, T}, state::NTuple{K, State}) = done(com
 @generated function next{K, T, State}(combs::Combinations{K, T}, state::NTuple{K, State})
     comb_elements = [gensym(:comb) for _ in 1:K]
     new_states = [gensym(:state) for _ in 1:K]
-    labels = [gensym(symbol(:label, l)) for l in 1:K]
+    labels = [gensym(Symbol(:label, l)) for l in 1:K]
 
     next_expr = Expr(:block)
     for i in 1:K
@@ -126,7 +126,7 @@ done{K, T, State}(combs::MultiCombinations{K, T}, state::NTuple{K, State}) = don
 @generated function next{K, T, State}(combs::MultiCombinations{K, T}, state::NTuple{K, State})
     comb_elements = [gensym(:comb) for _ in 1:K]
     new_states = [gensym(:state) for _ in 1:K]
-    labels = [gensym(symbol(:label, l)) for l in 1:K]
+    labels = [gensym(Symbol(:label, l)) for l in 1:K]
 
     next_expr = Expr(:block)
     for i in 1:K
